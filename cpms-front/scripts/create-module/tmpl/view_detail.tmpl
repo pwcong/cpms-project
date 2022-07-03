@@ -1,0 +1,68 @@
+<template>
+  <p-spin :spinning="loading">
+    <list-layout style="padding-bottom: 16px">
+      <p-form-model
+        ref="form"
+        :model="formData"
+        :label-col="{ span: 24 }"
+        :wrapper-col="{ span: 24 }"
+      >
+        <block>
+          <template v-slot:title>
+            <p-breadcrumb>
+              <p-breadcrumb-item>首页</p-breadcrumb-item>
+              <p-breadcrumb-item><%cnName%>详情</p-breadcrumb-item>
+            </p-breadcrumb>
+          </template>
+          <template v-slot:action>
+            <p-button style="margin-left: 8px" type="primary" @click="handleEdit(id)">
+              编辑
+            </p-button>
+            <p-button style="margin-left: 8px" @click="handleCancel"> 返回 </p-button>
+          </template>
+        </block>
+
+        <block theme="primary" title="基本信息" style="margin-top: 16px">
+          <p-row style="margin-top: 16px">
+            <p-col :span="8">
+              <p-form-model-item label="<%cnName%>名称" prop="fdName">
+                <p-input :value="formData.fdName" readOnly />
+              </p-form-model-item>
+            </p-col>
+          </p-row>
+        </block>
+      </p-form-model>
+    </list-layout>
+  </p-spin>
+</template>
+
+<script>
+import formMixin from '../<%enName%>Edit/form';
+
+export default {
+  name: '<%cnName%>详情',
+  mixins: [formMixin],
+  data() {
+    const { id } = this.$route.params;
+    return {
+      id,
+      inited: false,
+    };
+  },
+  computed: {
+    isEdit() {
+      return !!this.id;
+    },
+  },
+  created() {
+    this.initFormData(this.id);
+  },
+  activated() {
+    if (this.inited) {
+      this.initFormData(this.id);
+    } else {
+      this.inited = true;
+    }
+  },
+};
+</script>

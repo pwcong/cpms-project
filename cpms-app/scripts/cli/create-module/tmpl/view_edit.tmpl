@@ -1,0 +1,77 @@
+<template>
+  <list-layout>
+    <template v-slot:header="{ className }">
+      <van-nav-bar
+        :class="className"
+        :title="`<%cnName%>${isEdit ? '编辑' : '新建'}`"
+        left-text="返回"
+        left-arrow
+        @click-left="handleCancel"
+        :right-text="!isEdit || formData.fdStatus === 'draft' ? '暂存' : undefined"
+        @click-right="onSubmit('draft')"
+      />
+    </template>
+    <template v-slot:main="{ className }">
+      <div :class="className" style="top: 46px; height: calc(100% - 90px)">
+        <van-form ref="form" @submit="onSubmit(isEdit ? 'edit' : 'add')">
+          <block title="基本信息" theme="primary">
+            <van-field
+              required
+              v-model="formData.fdName"
+              name="fdName"
+              label="<%cnName%>名称"
+              placeholder="请输入"
+              :rules="[{ required: true, message: '请输入<%cnName%>名称' }]"
+            />
+          </block>
+        </van-form>
+      </div>
+    </template>
+    <template v-slot:footer="{ className }">
+      <div :class="className">
+        <van-button :loading="loading" block type="danger" @click="handleSubmit"> 提交 </van-button>
+      </div>
+    </template>
+  </list-layout>
+</template>
+
+<script>
+import formMixin from './form';
+
+export default {
+  name: '<%cnName%>编辑',
+  mixins: [formMixin],
+  data() {
+    const { id } = this.$route.params;
+    return {
+      id,
+    };
+  },
+  computed: {
+    isEdit() {
+      return !!this.id;
+    },
+  },
+  created() {
+    this.initFormData(this.id);
+  },
+  methods: {
+    handleSubmit() {
+      this.$refs.form.submit();
+    },
+    onSubmit(action) {
+      if (!!this.loading || (action !== 'draft' && !this.checkFormData(this.formData))) {
+        return;
+      }
+
+      this.$dialog
+        .confirm({
+          title: `是否确认${action === 'draft' ? '暂存' : '提交'}表单?`,
+        })
+        .then(() => {
+          this.submitFormData(this.formData, action);
+        });
+    },
+  },
+};
+</script>

@@ -1,0 +1,67 @@
+<template>
+  <block title="操作记录" theme="primary">
+    <div class="table">
+      <div class="table-main">
+        <table v-if="list.length > 0">
+          <thead>
+            <th>序号</th>
+            <th>时间</th>
+            <th>操作</th>
+          </thead>
+
+          <tbody>
+            <tr v-for="(item, index) in list" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ formatDateTime(item.createTime) }}</td>
+              <td>{{ item.fdOperationFullTitle }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <van-empty v-else image-size="100px" description="暂无数据" />
+      </div>
+    </div>
+  </block>
+</template>
+
+<script>
+import api from '@/api';
+import { buildListMixin, formatMixin } from '@/mixins';
+
+const listMixin = buildListMixin({
+  getQuery: (_, query) => ({
+    ...query,
+    limit: 999,
+    fdModuleId: _.moduleId,
+    fdModuleFlag: _.moduleFlag,
+  }),
+  getData: (_, query) => {
+    return !!query.fdModuleId && !!query.fdModuleFlag
+      ? api.common.getModifyRecord(query)
+      : Promise.resolve({
+          data: [],
+        });
+  },
+});
+
+export default {
+  name: 'modify-record',
+  props: {
+    moduleFlag: String,
+    moduleId: String,
+  },
+  mixins: [listMixin, formatMixin],
+  watch: {
+    moduleId() {
+      this.onRefresh();
+    },
+    moduleFlag() {
+      this.onRefresh();
+    },
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+@import '@/assets/scss/table.scss';
+</style>

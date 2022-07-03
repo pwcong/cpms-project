@@ -1,0 +1,42 @@
+<template>
+  <list-layout>
+    <template v-slot:header="{ className }">
+      <van-nav-bar
+        :class="className"
+        title="<%cnName%>详情"
+        left-text="返回"
+        left-arrow
+        @click-left="handleCancel"
+        right-text="编辑"
+        @click-right="handleEdit(id)"
+      />
+    </template>
+    <template v-slot:main="{ className }">
+      <div :class="className" style="top: 46px; height: calc(100% - 46px)">
+        <van-form ref="form" @submit="onSubmit(isEdit ? 'edit' : 'add')">
+          <block title="基本信息" theme="primary">
+            <van-field :value="formData.fdName" readonly name="fdName" label="<%cnName%>名称" />
+          </block>
+        </van-form>
+      </div>
+    </template>
+  </list-layout>
+</template>
+
+<script>
+import formMixin from '../<%enName%>Edit/form';
+
+export default {
+  name: '<%cnName%>详情',
+  mixins: [formMixin],
+  data() {
+    const { id } = this.$route.params;
+    return {
+      id,
+    };
+  },
+  created() {
+    this.initFormData(this.id);
+  },
+};
+</script>

@@ -1,0 +1,114 @@
+<template>
+  <van-popup
+    :value="visible"
+    position="right"
+    :style="{ width: '100%', height: '100vh' }"
+    :get-container="selectionContainer"
+  >
+    <list-layout>
+      <template v-slot:header="{ className }">
+        <van-nav-bar
+          :class="className"
+          :title="title"
+          left-text="取消"
+          left-arrow
+          @click-left="onCancel"
+          :right-text="allowEdit ? '确定' : undefined"
+          @click-right="handleSubmit"
+        />
+      </template>
+      <template v-slot:main="{ className }">
+        <div :class="className" style="top: 46px; height: calc(100% - 46px)">
+          <van-form ref="form" @submit="onFormSubmit">
+            <block>
+              <van-field
+                :required="allowEdit"
+                :placeholder="allowEdit ? '请输入' : undefined"
+                v-model="tempValue.fdName"
+                name="fdName"
+                label="<%cnName%>名称"
+                :readonly="!allowEdit"
+                :rules="
+                  allowEdit
+                    ? [
+                        {
+                          required: true,
+                          message: '请输入<%cnName%>名称',
+                        },
+                      ]
+                    : undefined
+                "
+              />
+            </block>
+          </van-form>
+        </div>
+      </template>
+    </list-layout>
+  </van-popup>
+</template>
+
+<script>
+import { buildSelectionMixin } from '@/mixins';
+
+const defaultValue = {
+  fdName: '',
+};
+
+const selectionMixin = buildSelectionMixin({
+  valueType: Object,
+  defaultValue,
+});
+
+export default {
+  name: 'setting-item',
+  mixins: [selectionMixin],
+  props: {
+    moduleId: {
+      type: String,
+    },
+  },
+  watch: {
+    visible: {
+      immediate: true,
+      handler(v) {
+        !!v && this.handleInit(this.moduleId);
+      },
+    },
+    moduleId: {
+      immediate: true,
+      handler(v) {
+        this.handleInit(v);
+      },
+    },
+  },
+  computed: {
+    allowEdit() {
+      return this.mode !== 'view';
+    },
+    title() {
+      return `${this.allowEdit ? (this.mode === 'edit' ? '编辑' : '新增') : '查看'}<%cnName%>`;
+    },
+  },
+  methods: {
+    handleInit(id) {
+      if (!!id) {
+        // 编辑详情页面调用接口获取数据
+        this.tempValue = {
+          ...this.tempValue,
+        };
+      } else {
+        // 新建页面初始化数据
+        this.tempValue = {
+          ...defaultValue,
+        };
+      }
+    },
+    handleSubmit() {
+      this.$refs.form.submit();
+    },
+    onFormSubmit() {
+      this.onOk();
+    },
+  },
+};
+</script>

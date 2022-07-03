@@ -1,0 +1,94 @@
+<template>
+  <list-layout>
+    <template v-slot:header="{ className }">
+      <van-nav-bar
+        :class="className"
+        title="<%cnName%>列表"
+        left-text="返回"
+        left-arrow
+        right-text="新建"
+        @click-left="handleCancel"
+        @click-right="handleAction({}, 'add')"
+      />
+    </template>
+    <template v-slot:toolbar="{ className }">
+      <div :class="className" style="top: 46px">
+        <div class="toolbar">
+          <van-search v-model="query.fdName" placeholder="请输入<%cnName%>名称搜索" />
+        </div>
+      </div>
+    </template>
+    <template v-slot:main="{ className }">
+      <van-pull-refresh
+        style="top: 100px; height: calc(100vh - 100px)"
+        :class="className"
+        :value="loading && !loadingMore"
+        @refresh="onRefresh(true)"
+      >
+        <van-list :value="loadingMore" :finished="!hasMore" finished-text="没有更多了" @load="onLoadMore">
+          <card-list :data="list">
+            <template v-slot="{ item }">
+              <van-cell-group @click="handleAction(item, 'view')">
+                <van-cell title="<%cnName%>名称" :value="item.fdName" />
+                <van-cell title="">
+                  <van-button size="small" type="danger" @click.stop="handleAction(item, 'view')"> 详情 </van-button>
+                  <van-button size="small" type="danger" @click.stop="handleAction(item, 'edit')"> 编辑 </van-button>
+                </van-cell>
+              </van-cell-group>
+            </template>
+          </card-list>
+        </van-list>
+      </van-pull-refresh>
+    </template>
+
+    <setting-item :moduleId="itemValue.id" :visible.sync="itemVisible" :mode="itemMode" @change="onRefresh(true)" />
+  </list-layout>
+</template>
+
+<script>
+import { buildListMixin } from '@/mixins';
+
+import SettingItem from './setting-item';
+
+const listMixin = buildListMixin({
+  properties: ['fdName'],
+  getQuery: (_, query) => ({
+    pageNo: query.pageNo,
+    limit: query.pageSize,
+    fdName: query.fdName,
+  }),
+  getData: (_, query) => {
+    return Promise.resolve({
+      data: Array.from(new Array(query.limit)).map((_, i) => ({
+        id: `${i}`,
+        fdName: `<%cnName%>名称${i}`,
+      })),
+    });
+  },
+});
+
+export default {
+  name: '<%cnName%>列表',
+  mixins: [listMixin],
+  components: {
+    SettingItem,
+  },
+  data() {
+    return {
+      itemVisible: false,
+      itemMode: 'edit',
+      itemValue: {},
+    };
+  },
+  methods: {
+    handleCancel() {
+      this.$root.goBack();
+    },
+    handleAction(item, mode) {
+      this.itemValue = item;
+      this.itemMode = mode;
+      this.itemVisible = true;
+    },
+  },
+};
+</script>

@@ -1,0 +1,169 @@
+<template>
+  <list-layout>
+    <template v-slot:header>
+      <block>
+        <template v-slot:title>
+          <p-breadcrumb>
+            <p-breadcrumb-item>首页</p-breadcrumb-item>
+            <p-breadcrumb-item><%cnName%>列表</p-breadcrumb-item>
+          </p-breadcrumb>
+        </template>
+        <template v-slot:action>
+          <p-button
+            type="primary"
+            @click="handleAction({}, 'add')"
+            style="margin-left: 8px"
+          >
+            新建
+          </p-button>
+        </template>
+      </block>
+    </template>
+    <template v-slot:toolbar="{ className }">
+      <div :class="className" style="margin-top: 16px">
+        <p-switch-form :col="3" :model="query">
+          <p-switch-form-item label="<%cnName%>名称">
+            <p-input v-model="query.fdName" placeholder="请输入" />
+          </p-switch-form-item>
+          <template slot="button">
+            <p-popover placement="bottomLeft" trigger="click">
+              <template slot="content">
+                <table-hider v-model="propertiesMeta" />
+              </template>
+              <p-button type="primary" icon="filter" />
+            </p-popover>
+
+            <p-button type="primary" @click="onRefresh(false)" icon="search" />
+          </template>
+        </p-switch-form>
+      </div>
+    </template>
+    <template v-slot:main="{ className }">
+      <div :class="className">
+        <p-table
+          :scroll="{ x: true }"
+          rowKey="id"
+          :loading="loading"
+          :columns="propertiesWithMeta"
+          :data-source="list"
+          bordered
+          :pagination="{
+            current: pageNo,
+            pageSize: pageSize,
+            total: totalSize,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            pageSizeOptions: ['10', '20', '30', '50'],
+            showTotal: (total) => `共有 ${total} 条数据`,
+          }"
+          @change="handleList"
+        >
+          <template slot="operation" slot-scope="text, record">
+            <span>
+              <p-button-link @click="handleAction(record, 'view')"> 详情 </p-button-link>
+              <p-button-link @click="handleAction(record, 'edit')"> 编辑 </p-button-link>
+            </span>
+          </template>
+        </p-table>
+      </div>
+
+      <setting-item
+        :moduleId="itemValue.id"
+        :visible.sync="itemVisible"
+        :mode="itemMode"
+        @change="onRefresh(true)"
+      />
+    </template>
+  </list-layout>
+</template>
+
+<script>
+import { buildListMixin } from '@/mixins';
+import { buildTable4ListMixin } from '@/views/mixins';
+
+import SettingItem from './setting-item';
+
+const listMixin = buildListMixin({
+  properties: ['fdName'],
+  getQuery: (_, query) => {
+    const { sorter = [] } = query;
+    let targetQuery = {
+      pageNo: query.pageNo,
+      limit: query.pageSize,
+      fdName: query.fdName,
+    };
+
+    if (sorter.length > 0) {
+      targetQuery = {
+        ...targetQuery,
+        sortList: sorter
+          .filter((d) => !!d.value)
+          .map((d) => `${d.key}@${d.value}`)
+          .join(','),
+      };
+    }
+
+    return targetQuery;
+  },
+  getData: (_, query) => {
+    return Promise.resolve({
+      data: Array.from(new Array(query.limit)).map((_, i) => ({
+        id: i,
+        fdName: `<%cnName%>名称${i}`,
+      })),
+    });
+  },
+});
+
+const tableMixin = buildTable4ListMixin({
+  getProperties: (_) => {
+    return [
+      {
+        title: '序号',
+        width: 50,
+        fixed: 'left',
+        dataIndex: 'index',
+        customRender: (text, record, index) => `${index + 1}`,
+      },
+      {
+        title: '<%cnName%>名称',
+        dataIndex: 'fdName',
+        sorter: true,
+        hider: true,
+      },
+      {
+        title: '操作',
+        dataIndex: 'operation',
+        fixed: 'right',
+        width: 120,
+        scopedSlots: {
+          customRender: 'operation',
+        },
+      },
+    ];
+  },
+  sorterMap: {},
+});
+
+export default {
+  name: '<%cnName%>列表',
+  mixins: [listMixin, tableMixin],
+  components: {
+    SettingItem,
+  },
+  data() {
+    return {
+      itemVisible: false,
+      itemMode: 'edit',
+      itemValue: {},
+    };
+  },
+  methods: {
+    handleAction(item, mode) {
+      this.itemValue = item;
+      this.itemMode = mode;
+      this.itemVisible = true;
+    },
+  },
+};
+</script>

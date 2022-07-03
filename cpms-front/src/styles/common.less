@@ -1,0 +1,73 @@
+@font-face {
+  font-family: 思源黑体;
+  src: url('./fonts/SourceHanSansCN-Normal.otf');
+}
+@font-face {
+  font-family: 思源黑体;
+  src: url('./fonts/SourceHanSansCN-Medium.otf');
+  font-weight: bold;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: '思源黑体', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.poros-switch-form .poros-form-item-label {
+  width: unset;
+  min-width: 70px;
+}
+
+.poros-form {
+  &-item-label {
+    white-space: pre-wrap !important;
+    padding-right: 4px !important;
+  }
+}
+
+.poros-modal {
+  &-header {
+    pointer-events: none;
+  }
+}
+
+.poros-switch-form {
+  .poros-btn-group {
+    margin-top: 0 !important;
+  }
+}
+
+.poros-pagination-item-active,
+.poros-pagination-item-active:hover,
+.poros-pagination-item-active:focus {
+  background-color: @primary-color;
+}
+
+// .home {
+//   .poros-sider-menu .poros-menu.poros-menu-root > .poros-menu-submenu > .poros-menu-submenu-title span {
+//     font-size: 14px !important;
+//   }
+//   .poros-sider-menu .poros-menu .poros-menu-sub .poros-menu-submenu .poros-menu-submenu-title span {
+//     font-size: 13px!important;
+//   }
+//   .poros-tabs-nav-container {
+//     font-size: 13px;
+//   }
+// }
+@import 'nprogress';

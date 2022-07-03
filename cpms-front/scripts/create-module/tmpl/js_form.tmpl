@@ -1,0 +1,108 @@
+export function getFormData() {
+  return {
+    fdName: '',
+    fdStatus: '',
+  };
+}
+
+export function getFormRules({}) {
+  return {
+    fdName: [
+      {
+        required: true,
+        message: '请输入<%cnName%>名称',
+        trigger: 'blur',
+      },
+    ],
+  };
+}
+
+export default {
+  data() {
+    return {
+      loading: false,
+      formData: getFormData(),
+    };
+  },
+  computed: {
+    formRules() {
+      return getFormRules({});
+    },
+  },
+  methods: {
+    handleCancel() {
+      this.$router.back(true);
+    },
+    handleDetail(id) {
+      this.$router.push({
+        path: `<%&detailRoute%>/${id}`,
+      });
+    },
+    handleCreate() {
+      this.$router.push({
+        path: '<%&createRoute%>',
+      });
+    },
+    handleEdit(id) {
+      this.$router.push({
+        path: `<%&editRoute%>/${id}`,
+      });
+    },
+    async initFormData(id) {
+      this.loading = true;
+      try {
+        if (!!id) {
+          // 编辑详情页面调用接口获取数据
+          this.formData = {
+            ...this.formData,
+          };
+        } else {
+          // 新建页面初始化数据
+          this.formData = {
+            ...this.formData,
+          };
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async submitFormData(formData, action) {
+      this.loading = true;
+
+      try {
+        formData = {
+          ...formData,
+        };
+
+        switch (action) {
+          case 'draft':
+            this.$message.success('表单暂存成功');
+            break;
+          case 'add':
+            this.$message.success('表单提交成功');
+            break;
+          case 'edit':
+            this.$message.success('表单提交成功');
+            break;
+          default:
+            break;
+        }
+
+        setTimeout(() => {
+          this.handleCancel();
+        }, 300);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.loading = false;
+      }
+    },
+    checkFormData(formData) {
+      // 校验表单数据
+      return true;
+    },
+  },
+};

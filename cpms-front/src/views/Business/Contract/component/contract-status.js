@@ -1,0 +1,26 @@
+import { buildSelectBase } from '@/components/select-base'
+import { buildPropsHOC } from '@/utils/hoc'
+import api from '@/api'
+
+export default buildPropsHOC(buildSelectBase(), 'select-contract-status', {
+  getOptions: {
+    type: Function,
+    default: (_, query) => {
+      return api.contract
+        .getContractStatus({
+          limit: 200,
+          pageNo: 1,
+          keyword: query.fdStatus
+        })
+        .then(res => {
+          return {
+            ...res,
+            data: (res.data || []).map(d => ({
+              text: d.value,
+              value: d.key
+            }))
+          }
+        })
+    }
+  }
+})

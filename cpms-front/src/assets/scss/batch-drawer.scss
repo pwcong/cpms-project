@@ -1,0 +1,28 @@
+@import './common.scss';
+
+.batch-drawer {
+  .batch-table {
+    .poros-table-thead th.required {
+      &::before {
+        content: '*';
+        margin-right: 2px;
+        color: $theme-color;
+      }
+    }
+
+    .poros-form-item {
+      margin-bottom: 0;
+    }
+  }
+  .batch-footer {
+    box-shadow: 0 -2px 12px rgba(100, 101, 102, 0.2);
+    padding: 12px 24px;
+    text-align: right;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    position: absolute;
+    background-color: white;
+    border-top: 1px solid #eeeeee;
+  }
+}

@@ -1,0 +1,112 @@
+<template>
+  <p-modal
+    :maskClosable="false"
+    :title="title"
+    :visible="visible"
+    width="400px"
+    @cancel="onCancel"
+  >
+    <p-form-model ref="form" :model="tempValue" :rules="rules">
+      <p-form-model-item label="<%cnName%>名称" prop="fdName">
+        <p-input
+          v-model="tempValue.fdName"
+          :readOnly="!allowEdit"
+          :placeholder="allowEdit ? '请输入' : ''"
+          :maxLength="200"
+        />
+      </p-form-model-item>
+    </p-form-model>
+    <span slot="footer">
+      <template v-if="allowEdit">
+        <p-button @click="onCancel">取 消</p-button>
+        <p-button type="primary" @click="handleSubmit">确 定</p-button>
+      </template>
+      <template v-else>
+        <p-button @click="onCancel">关 闭</p-button>
+      </template>
+    </span>
+  </p-modal>
+</template>
+
+<script>
+import { buildSelectionMixin } from '@/mixins';
+
+const defaultValue = {
+  fdName: '',
+};
+
+const selectionMixin = buildSelectionMixin({
+  valueType: Object,
+  defaultValue,
+});
+
+export default {
+  name: 'setting-item',
+  mixins: [selectionMixin],
+  props: {
+    moduleId: {
+      type: String,
+    },
+  },
+  watch: {
+    visible: {
+      immediate: true,
+      handler(v) {
+        !!v && this.handleInit(this.moduleId);
+      },
+    },
+    moduleId: {
+      immediate: true,
+      handler(v) {
+        this.handleInit(v);
+      },
+    },
+  },
+  computed: {
+    allowEdit() {
+      return this.mode !== 'view';
+    },
+    title() {
+      return `${
+        this.allowEdit ? (this.mode === 'edit' ? '编辑' : '新建') : '查看'
+      }<%cnName%>`;
+    },
+    rules() {
+      return !!this.allowEdit
+        ? {
+            fdName: [
+              {
+                required: true,
+                message: '请输入<%cnName%>名称',
+                trigger: 'blur',
+              },
+            ],
+          }
+        : undefined;
+    },
+  },
+  methods: {
+    handleInit(id) {
+      if (!!id) {
+        // 编辑详情页面调用接口获取数据
+        this.tempValue = {
+          ...this.tempValue,
+        };
+      } else {
+        // 新建页面初始化数据
+        this.tempValue = {
+          ...defaultValue,
+        };
+      }
+    },
+    handleSubmit() {
+      this.$refs.form.validate((valid) => {
+        if (!valid) {
+          return;
+        }
+        this.onOk();
+      });
+    },
+  },
+};
+</script>
